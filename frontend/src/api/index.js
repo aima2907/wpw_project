@@ -1,14 +1,19 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'wpwproject-production.up.railway.app/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
 // Attach token to every request if it exists
+// Attach token to every request if it exists
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('tugasku_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  // Mengecek label 'tugasku_token' ATAU 'token' biasa biar gak kecolongan kosong (null)
+  const token = localStorage.getItem('tugasku_token') || localStorage.getItem('token')
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
   return config
 })
 

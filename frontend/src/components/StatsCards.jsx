@@ -1,8 +1,8 @@
 export default function StatsCards({ tasks }) {
   const total   = tasks.length
   const done    = tasks.filter((t) => t.status === 'done').length
-  const pending = tasks.filter((t) => t.status !== 'done').length
-  const urgent  = tasks.filter((t) => t.priority === 'high' && t.status !== 'done').length
+  const pending = tasks.filter((t) => t.status === 'pending').length
+  const inProgress = tasks.filter((t) => t.status === 'in-progress').length
 
   const pad = (n) => String(n).padStart(2, '0')
 
@@ -41,15 +41,15 @@ export default function StatsCards({ tasks }) {
         <div className="stat-val" style={{ color: 'var(--warning)' }}>{pad(pending)}</div>
       </div>
 
-      <div className="stat-card red">
-        <div className="stat-icon red">
+      <div className="stat-card blue">
+        <div className="stat-icon blue">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="9" cy="9" r="7.5" stroke="#EF4444" strokeWidth="1.5" />
-            <path d="M9 5.5v4M9 12.5v.5" stroke="#EF4444" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="9" cy="9" r="3" fill="#3B82F6"/>
           </svg>
         </div>
-        <div className="stat-label">Urgent</div>
-        <div className="stat-val" style={{ color: 'var(--danger)' }}>{pad(urgent)}</div>
+        <div className="stat-label">In Progress</div>
+        <div className="stat-val" style={{ color: 'var(--info)' }}>{pad(inProgress)}</div>
       </div>
     </div>
   )

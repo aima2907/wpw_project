@@ -2,18 +2,12 @@ import { useState, useEffect } from 'react'
 
 const CATEGORIES = ['Work', 'Personal', 'Finance', 'Design', 'Sales', 'Kuliah']
 
-const KULIAH_OPTIONS = [
-  { group: 'Semester Ini', options: [
-    'Basis Data', 'Algoritma & Struktur Data', 'Sistem Operasi',
-    'Pemrograman Web', 'Jaringan Komputer', 'Matematika Diskrit',
-    'Kalkulus', 'Fisika Dasar', 'Pancasila', 'Bahasa Indonesia', 'Bahasa Inggris',
-  ]},
-  { group: 'Lainnya', options: ['Praktikum', 'Kerja Praktek', 'Skripsi / TA'] },
-]
-
 const DEFAULT_FORM = {
-  name: '', description: '', date: '', status: 'pending',
-  category: 'Work', subject: '', priority: 'high',
+  title: '',           // ← ganti dari 'name' ke 'title'
+  description: '', 
+  deadline: '',        // ← ganti dari 'date' ke 'deadline'
+  status: 'pending',
+  category: 'Work',
 }
 
 export default function TaskForm({ isOpen, onClose, onSave, prefillDate, loading }) {
@@ -21,49 +15,48 @@ export default function TaskForm({ isOpen, onClose, onSave, prefillDate, loading
 
   useEffect(() => {
     if (isOpen) {
-      setForm({ ...DEFAULT_FORM, date: prefillDate || '' })
+      setForm({ 
+        ...DEFAULT_FORM, 
+        deadline: prefillDate || '' 
+      })
     }
   }, [isOpen, prefillDate])
 
   const set = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }))
 
-  const handleCat = (cat) => {
-    setForm((p) => ({ ...p, category: cat, subject: '' }))
-  }
-
-  const handlePrio = (prio) => setForm((p) => ({ ...p, priority: prio }))
+  const handleCategory = (cat) => setForm((p) => ({ ...p, category: cat }))
 
   const handleSave = () => {
-    if (!form.name.trim()) return
-    if (form.category === 'Kuliah' && !form.subject) return
+    if (!form.title.trim()) return
+    
     onSave({
-      name: form.name.trim(),
-      description: form.description.trim() || 'Tidak ada deskripsi.',
-      date: form.date,
+      title: form.title.trim(),
+      description: form.description.trim() || '',
+      deadline: form.deadline,
       status: form.status,
       category: form.category,
-      subject: form.category === 'Kuliah' ? form.subject : '',
-      priority: form.priority,
     })
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose() }}>
+      <div className="modal" role="dialog" aria-modal="true">
         <div className="modal-header">
-          <div className="modal-title">Input Tugas</div>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <div className="modal-title">Tambah Tugas Baru</div>
+          <button className="modal-close" onClick={onClose} disabled={loading}>×</button>
         </div>
 
         <div className="form-group">
-          <label className="modal-label">Judul Tugas</label>
+          <label className="modal-label">Judul Tugas <span className="required">*</span></label>
           <input
             className="modal-input"
-            placeholder="Masukkan judul..."
-            value={form.name}
-            onChange={set('name')}
+            placeholder="Masukkan judul tugas..."
+            value={form.title}
+            onChange={set('title')}
+            disabled={loading}
+            autoFocus
           />
         </div>
 
@@ -74,6 +67,8 @@ export default function TaskForm({ isOpen, onClose, onSave, prefillDate, loading
             placeholder="Detail tentang tugas ini..."
             value={form.description}
             onChange={set('description')}
+            rows={3}
+            disabled={loading}
           />
         </div>
 
@@ -83,13 +78,14 @@ export default function TaskForm({ isOpen, onClose, onSave, prefillDate, loading
             <input
               className="modal-input"
               type="date"
-              value={form.date}
-              onChange={set('date')}
+              value={form.deadline}
+              onChange={set('deadline')}
+              disabled={loading}
             />
           </div>
           <div className="form-group">
             <label className="modal-label">Status</label>
-            <select className="modal-select" value={form.status} onChange={set('status')}>
+            <select className="modal-select" value={form.status} onChange={set('status')} disabled={loading}>
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
@@ -104,58 +100,31 @@ export default function TaskForm({ isOpen, onClose, onSave, prefillDate, loading
               <button
                 key={cat}
                 className={`cat-btn${form.category === cat ? ' active' : ''}`}
-                onClick={() => handleCat(cat)}
+                onClick={() => handleCategory(cat)}
                 type="button"
+                disabled={loading}
               >
+                {cat === 'Work' && ''}
+                {cat === 'Personal' && ''}
+                {cat === 'Finance' && ''}
+                {cat === 'Design' && ''}
+                {cat === 'Sales' && ''}
+                {cat === 'Kuliah' && ''}
                 {cat}
               </button>
             ))}
           </div>
         </div>
 
-        {form.category === 'Kuliah' && (
-          <div className="form-group">
-            <label className="modal-label">Mata Kuliah</label>
-            <select
-              className="modal-select"
-              value={form.subject}
-              onChange={set('subject')}
-            >
-              <option value="">— Pilih Mata Kuliah —</option>
-              {KULIAH_OPTIONS.map((g) => (
-                <optgroup key={g.group} label={g.group}>
-                  {g.options.map((o) => (
-                    <option key={o} value={o}>{o}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="form-group">
-          <label className="modal-label">Prioritas</label>
-          <div className="prio-btns">
-            {['high', 'medium', 'low'].map((p) => (
-              <button
-                key={p}
-                type="button"
-                className={`prio-btn ${p}${form.priority === p ? ' active' : ''}`}
-                onClick={() => handlePrio(p)}
-              >
-                {p.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="modal-foot">
-          <button className="btn-cancel" type="button" onClick={onClose}>Batal</button>
+          <button className="btn-cancel" type="button" onClick={onClose} disabled={loading}>
+            Batal
+          </button>
           <button
             className="btn-save"
             type="button"
             onClick={handleSave}
-            disabled={loading || !form.name.trim() || (form.category === 'Kuliah' && !form.subject)}
+            disabled={loading || !form.title.trim()}
           >
             {loading ? 'Menyimpan...' : 'Simpan Tugas'}
           </button>
