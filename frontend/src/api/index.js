@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'wpwproject-production.up.railway.app/api',
+  baseURL: 'https://wpw-project-production.up.railway.app/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
