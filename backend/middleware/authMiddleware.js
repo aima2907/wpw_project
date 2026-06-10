@@ -1,37 +1,32 @@
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
-
   try {
+    const authHeader = req.headers.authorization;
 
-    const token = req.headers.authorization;
-
-    // cek token ada atau tidak
-    if (!token) {
+    // 1. Cek token ada atau tidak di headers
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        message: "Token tidak ada"
+        message: "Token tidak ada atau format salah"
       });
     }
 
-    // verifikasi token
-    const verified = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    // 2. POTONG kata "Bearer " untuk mengambil token aslinya saja!
+    const token = authHeader.split(" ")[1];
 
-    // simpan data user
+    // 3. Verifikasi token asli yang sudah bersih
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Simpan data user hasil verifikasi
     req.user = verified;
 
     next();
 
   } catch (error) {
-
     res.status(401).json({
-      message: error.message
+      message: "Verifikasi token gagal: " + error.message
     });
-
   }
-
 };
 
 module.exports = authMiddleware;

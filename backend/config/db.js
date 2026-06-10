@@ -1,13 +1,23 @@
-const { Pool } = require("pg");
-require("dotenv").config();
+const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  ssl: { rejectUnauthorized: false } //wajib ditambahkan karena pakai neon cloud
+  host: 'ep-aged-surf-ao98bfy9.c-2.ap-southeast-1.aws.neon.tech',
+  port: 5432,
+  user: 'neondb_owner',
+  password: 'npg_tU80disSZoMy',
+  database: 'neondb',
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+// Tes Koneksi Langsung saat server dinyalakan
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Gagal konek ke Neon:', err.message);
+  }
+  console.log('Koneksi ke Neon PostgreSQL SUKSES 100%! 🎉');
+  release();
 });
 
 module.exports = pool;

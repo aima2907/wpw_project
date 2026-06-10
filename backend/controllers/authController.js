@@ -14,7 +14,6 @@ const register = async (req, res) => {
         message: "Semua field harus diisi"
       });
     }
-
     // cek email sudah ada atau belum
     const checkUser = await pool.query(
       "SELECT * FROM users WHERE email = $1",
